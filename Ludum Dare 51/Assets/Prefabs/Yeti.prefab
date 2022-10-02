@@ -104,6 +104,8 @@ MonoBehaviour:
   baseHealth: 1
   currentHealth: 0
   bloodSplatterPrefab: {fileID: 8637468873780185759, guid: f575fc75ce8366b48b9b1f9ad27a99fd, type: 3}
+  yetiDeathClip: {fileID: 8300000, guid: 79ffd250cdcb12448a5a83d65e8895f1, type: 3}
+  yetiEatingClip: {fileID: 8300000, guid: dd3d085b3fa292c43875c1ce865ed4e1, type: 3}
 --- !u!61 &1810986334259677285
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -175,4 +177,4 @@ MonoBehaviour:
   - {x: -0.055289757, y: -0.14460373, z: 0.000000007450581}
   m_ShapePathHash: 323215793
   m_Mesh: {fileID: 0}
-  m_InstanceId: 59850
+  m_InstanceId: 67992

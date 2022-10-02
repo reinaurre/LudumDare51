@@ -2,27 +2,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class GunController : MonoBehaviour
 {
     public GunBase currentGun;
     public GunBase[] guns;
 
     private float elapsedTime;
-    private int currentIndex;
+    private int currentIndex = -1;
+    private AudioSource gunfireAudioSource;
+
+    private int gunNumber;
 
     // Start is called before the first frame update
     void Start()
     {
+        this.gunfireAudioSource = this.gameObject.GetComponent<AudioSource>();
+        this.elapsedTime = 0;
+        this.gunNumber = 0;
+
         if (!GameManager.instance.isDevMode)
         {
+            currentGun = guns[0];
+            this.gunfireAudioSource.clip = currentGun.gunfireClip;
             StartCoroutine(SwitchGuns());
         }
         else
         {
             DevSwitchGuns();
         }
-
-        this.elapsedTime = 0;
     }
 
     // Update is called once per frame
@@ -32,12 +40,13 @@ public class GunController : MonoBehaviour
 
         if (this.elapsedTime >= this.currentGun.fireRate)
         {
+            this.gunfireAudioSource.Play();
             GameObject projectile = GameObject.Instantiate(this.currentGun.projectile);
             projectile.transform.position = this.transform.position;
             this.elapsedTime = 0;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && GameManager.instance.isDevMode)
         {
             this.DevSwitchGuns();
         }
@@ -47,10 +56,14 @@ public class GunController : MonoBehaviour
     {
         yield return new WaitForSeconds(10);
         GunBase previous = currentGun;
-        while (currentGun == previous)
+        while (currentGun == previous || (currentGun.name == "TacticalNuke" && this.gunNumber < 3))
         {
             currentGun = GetNewGun();
         }
+
+        this.gunNumber++;
+        this.gunfireAudioSource.clip = currentGun.gunfireClip;
+        currentGun.gunNameAudioSource.Play();
 
         StartCoroutine(SwitchGuns());
     }
@@ -67,6 +80,8 @@ public class GunController : MonoBehaviour
         }
         currentGun = guns[currentIndex];
 
+        this.gunfireAudioSource.clip = currentGun.gunfireClip;
+        currentGun.gunNameAudioSource.Play();
     }
 
     private GunBase GetNewGun()

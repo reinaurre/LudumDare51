@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class YetiController : MonoBehaviour
 {
     public float baseSpeed;
@@ -10,6 +11,10 @@ public class YetiController : MonoBehaviour
     public float currentHealth;
 
     public GameObject bloodSplatterPrefab;
+    public AudioClip yetiDeathClip;
+    public AudioClip yetiEatingClip;
+
+    private AudioSource audioSource;
 
     private GameObject target;
     private BackgroundScroller scroller;
@@ -21,6 +26,8 @@ public class YetiController : MonoBehaviour
         currentHealth = baseHealth * GameManager.instance.yetiLevel;
         baseSpeed = baseSpeed + (GameManager.instance.yetiLevel * 0.2f);
         scroller = GameObject.FindObjectOfType<BackgroundScroller>();
+        this.audioSource = this.gameObject.GetComponent<AudioSource>();
+        this.audioSource.clip = this.yetiEatingClip;
     }
 
     // Update is called once per frame
@@ -34,11 +41,10 @@ public class YetiController : MonoBehaviour
             float step = (baseSpeed - speedModifier) * Time.deltaTime;
 
             transform.position = Vector2.MoveTowards(transform.position, target.transform.position, step);
-            transform.position = new Vector3(transform.position.x, transform.position.y, -.1f);
 
-            if (transform.position.y > 10)
+            if (transform.position.y > 9)
             {
-                transform.position = new Vector3(transform.position.x, 10, -.1f);
+                transform.position = Vector2.MoveTowards(transform.position, new Vector2(transform.position.x, 9), baseSpeed/4 * Time.deltaTime);
             }
             if (transform.position.x < -7)
             {
@@ -48,6 +54,8 @@ public class YetiController : MonoBehaviour
             {
                 transform.position = new Vector3(7, transform.position.y, -.1f);
             }
+
+            transform.position = new Vector3(transform.position.x, transform.position.y, -.1f);
         }
     }
 
@@ -56,7 +64,10 @@ public class YetiController : MonoBehaviour
         if (collision.CompareTag("Player") && !GameManager.instance.noDeathMode)
         {
             if (!collision.GetComponent<PlayerController>().isJumping)
+            {
+                this.audioSource.Play();
                 GameManager.instance.KillPlayer();
+            }
         }
     }
 
@@ -65,7 +76,10 @@ public class YetiController : MonoBehaviour
         if (collision.CompareTag("Player") && !GameManager.instance.noDeathMode)
         {
             if (!collision.GetComponent<PlayerController>().isJumping)
+            {
+                this.audioSource.Play();
                 GameManager.instance.KillPlayer();
+            }
         }
     }
 
@@ -85,6 +99,7 @@ public class YetiController : MonoBehaviour
     {
         GameObject splatter = Instantiate(this.bloodSplatterPrefab);
         splatter.transform.position = this.transform.position;
+        splatter.GetComponent<ExplosionController>().explosionClip = this.yetiDeathClip;
 
         GameManager.instance.SpawnNewYeti();
         Destroy(this.gameObject);

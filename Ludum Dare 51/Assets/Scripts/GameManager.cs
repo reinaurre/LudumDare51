@@ -17,6 +17,7 @@ public class Obstacle
     public double _weight;
 }
 
+[RequireComponent(typeof(AudioSource))]
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance { get; private set; }
@@ -39,11 +40,16 @@ public class GameManager : MonoBehaviour
     public TMP_Text distanceTraveledText;
     public float distanceTraveled;
 
+    public AudioClip skiFreevengeClip;
+    public AudioClip gameOverClip;
+    public AudioClip playerDeathClip;
+
     [Space]
     public bool isDevMode;
     public bool noDeathMode;
 
     private int yetisKilled;
+    private AudioSource audioSource;
 
     private void Awake()
     {
@@ -61,6 +67,10 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         this.isPlayerActive = false;
+        this.audioSource = this.gameObject.GetComponent<AudioSource>();
+
+        this.audioSource.clip = this.skiFreevengeClip;
+        this.audioSource.Play();
     }
 
     private void FixedUpdate()
@@ -88,7 +98,7 @@ public class GameManager : MonoBehaviour
 
     public void BoostSpeed()
     {
-        this.elapsedAcceleration += 2;
+        this.elapsedAcceleration += 4;
     }
 
     public void SlowPlayer(int severity)
@@ -106,11 +116,20 @@ public class GameManager : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         GameObject splatter = Instantiate(this.bloodSplatterPrefab);
         splatter.transform.position = player.transform.position;
+        splatter.GetComponent<ExplosionController>().explosionClip = this.playerDeathClip;
 
         elapsedAcceleration = 0;
         this.isPlayerActive = false;
         Destroy(player);
         this.endScreen.SetActive(true);
+        StartCoroutine(PlayGameOverAudio());
+    }
+
+    public IEnumerator PlayGameOverAudio()
+    {
+        yield return new WaitForSeconds(1.5f);
+        this.audioSource.clip = this.gameOverClip;
+        this.audioSource.Play();
     }
 
     public void ResetGame()
@@ -119,6 +138,8 @@ public class GameManager : MonoBehaviour
         this.endScreen.SetActive(false);
         this.statsContainer.SetActive(false);
         this.startScreen.SetActive(true);
+        this.audioSource.clip = this.skiFreevengeClip;
+        this.audioSource.Play();
     }
 
     public void SpawnNewYeti()

@@ -14,6 +14,7 @@ public class Projectile : MonoBehaviour
     [Space]
     public GameObject optionalExplosionPrefab;
     public int optionalExplosionSize;
+    public int optionalExplosionLifetime;
 
     private Rigidbody2D rb;
     private float elapsedLifespan;
@@ -64,6 +65,7 @@ public class Projectile : MonoBehaviour
         explosion.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, -1f);
         explosion.GetComponent<ExplosionController>().damage = damage;
         explosion.GetComponent<ExplosionController>().scale = optionalExplosionSize;
+        explosion.GetComponent<ExplosionController>().explosionLifetime = optionalExplosionLifetime == 0 ? 2 : optionalExplosionLifetime;
         Destroy(this.gameObject);
     }
 }

@@ -146,6 +146,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5301c85823d78c45a2afa4e2102c93e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  projectileSpeed: 10
+  projectileSpeed: 4
   projectileLifespan: 10
   damage: 1
+  optionalExplosionPrefab: {fileID: 0}
+  optionalExplosionSize: 0
